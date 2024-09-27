@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Video Merger</title>
+  </head>
+  <body>
+    <h1>Video Merger</h1>
+
+    <h2>Static Start Video</h2>
+    <video width="100%" height="20%" id="static-start" controls>
+      <source src="start.mp4" type="video/mp4" />
+      Your browser does not support the video tag.
+    </video>
+
+    <h2>Dynamic Video Preview</h2>
+    <video width="100%" height="20%" style="border: 1px solid red;" id="video-preview" controls></video>
+
+    <h2>Static End Video</h2>
+    <video width="100%" height="20%" id="static-end" controls>
+      <source src="end.mp4" type="video/mp4" />
+      Your browser does not support the video tag.
+    </video>
+
+    <button id="upload-video">Upload Dynamic Video</button>
+    <button id="merge-videos">Merge Videos</button>
+
+    <script>
+      const uploadButton = document.getElementById("upload-video");
+      const mergeButton = document.getElementById("merge-videos");
+      const videoPreview = document.getElementById("video-preview");
+
+      let dynamicVideoPath = "";
+
+    
+      uploadButton.addEventListener("click", async () => {
+        dynamicVideoPath = await window.electronAPI.selectVideo();
+        if (dynamicVideoPath) {
+          videoPreview.src = dynamicVideoPath; // Show the uploaded video
+          videoPreview.load();
+        } else {
+          alert("No video selected.");
+        }
+      });
+
+      mergeButton.addEventListener("click", () => {
+        if (dynamicVideoPath) {
+          window.electronAPI.mergeVideos(dynamicVideoPath);
+        } else {
+          alert("Please upload a dynamic video first.");
+        }
+      });
+
+      window.electronAPI.onMergeComplete((event, outputPath) => {
+        alert(
+          "Videos merged successfully! You can find the merged video on your desktop."
+        );
+      });
+
+      window.electronAPI.onMergeError((event, errorMessage) => {
+        alert(`Error merging videos: ${errorMessage}`);
+      });
+    </script>
+  </body>
+</html>
